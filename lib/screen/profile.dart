@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:quizapp/screen/edit_profile.dart';
 import 'package:quizapp/screen/settings.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -17,11 +18,17 @@ class ProfileScreen extends StatelessWidget {
     });
 
     return Scaffold(
+      backgroundColor: const Color(0xFF1A1A1A),
       appBar: AppBar(
-        title: const Text('Profile'),
+        backgroundColor: const Color(0xFF2C2C2C),
+        elevation: 0,
+        title: const Text(
+          'Profile',
+          style: TextStyle(color: Colors.white),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings),
+            icon: const Icon(Icons.settings, color: Colors.white),
             onPressed: () {
               Navigator.push(
                 context,
@@ -33,38 +40,78 @@ class ProfileScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            CircleAvatar(
-              radius: 50,
-              backgroundColor: Theme.of(context).primaryColor,
-              child: Text(
-                user['name'][0],
-                style: const TextStyle(fontSize: 40, color: Colors.white),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF2C2C2C),
+              Color(0xFF1A1A1A),
+            ],
+          ),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 32),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: 110,
+                    height: 110,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [Colors.blue, Colors.purple],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
+                  ).animate()
+                    .scale(duration: const Duration(milliseconds: 300))
+                    .rotate(duration: const Duration(milliseconds: 500)),
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundColor: const Color(0xFF2C2C2C),
+                    child: Text(
+                      user['name'][0],
+                      style: const TextStyle(
+                        fontSize: 40,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ).animate()
+                    .scale(duration: const Duration(milliseconds: 300)),
+                ],
               ),
-            ).animate()
-              .scale(duration: const Duration(milliseconds: 300)),
-            const SizedBox(height: 20),
-            Text(
-              user['name'],
-              style: Theme.of(context).textTheme.headlineSmall,
-            ).animate()
-              .fadeIn()
-              .slideY(),
-            Text(
-              user['email'],
-              style: Theme.of(context).textTheme.bodyLarge,
-            ).animate()
-              .fadeIn()
-              .slideY(),
-            const SizedBox(height: 30),
-            const Divider(),
-            _buildStatsSection(context, user),
-            const Divider(),
-            _buildQuickActions(context),
-          ],
+              const SizedBox(height: 20),
+              Text(
+                user['name'],
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ).animate()
+                .fadeIn()
+                .slideY(),
+              Text(
+                user['email'],
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: Colors.white70,
+                ),
+              ).animate()
+                .fadeIn()
+                .slideY(),
+              const SizedBox(height: 30),
+              const Divider(color: Colors.white24, height: 1),
+              _buildStatsSection(context, user),
+              const Divider(color: Colors.white24, height: 1),
+              _buildQuickActions(context),
+            ],
+          ),
         ),
       ),
     );
@@ -72,17 +119,20 @@ class ProfileScreen extends StatelessWidget {
 
   Widget _buildStatsSection(BuildContext context, Map user) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Your Stats',
-            style: Theme.of(context).textTheme.titleLarge,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
           ).animate()
             .fadeIn()
             .slideX(),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           GridView.count(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -95,12 +145,14 @@ class ProfileScreen extends StatelessWidget {
                 'Quizzes Taken',
                 '${user['quizzesTaken']}',
                 Icons.quiz,
+                Colors.blue,
               ),
               _buildStatCard(
                 context,
                 'Average Score',
-                '${user['averageScore']}%',
+                '${user['averageScore'].toStringAsFixed(1)}%',
                 Icons.score,
+                Colors.purple,
               ),
             ],
           ),
@@ -114,28 +166,51 @@ class ProfileScreen extends StatelessWidget {
     String title,
     String value,
     IconData icon,
+    Color accentColor,
   ) {
     return Card(
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 32, color: Theme.of(context).primaryColor),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleMedium,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              value,
-              style: Theme.of(context).textTheme.headlineSmall,
-              textAlign: TextAlign.center,
-            ),
-          ],
+      elevation: 8,
+      color: const Color(0xFF2C2C2C),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              accentColor.withOpacity(0.2),
+              const Color(0xFF2C2C2C),
+            ],
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 32, color: accentColor),
+              const SizedBox(height: 12),
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: Colors.white70,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                value,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       ),
     ).animate()
@@ -144,33 +219,39 @@ class ProfileScreen extends StatelessWidget {
 
   Widget _buildQuickActions(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Quick Actions',
-            style: Theme.of(context).textTheme.titleLarge,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
           ).animate()
             .fadeIn()
             .slideX(),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           _buildActionButton(
             context,
             'Edit Profile',
             Icons.edit,
+            Colors.blue,
             () => _showEditProfileDialog(context),
           ),
           _buildActionButton(
             context,
             'View History',
             Icons.history,
+            Colors.green,
             () => _showQuizHistory(context),
           ),
           _buildActionButton(
             context,
             'Reset Progress',
             Icons.restart_alt,
+            Colors.red,
             () => _showResetConfirmation(context),
           ),
         ],
@@ -182,14 +263,23 @@ class ProfileScreen extends StatelessWidget {
     BuildContext context,
     String title,
     IconData icon,
+    Color color,
     VoidCallback onTap,
   ) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: 12),
+      color: const Color(0xFF2C2C2C),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      elevation: 4,
       child: ListTile(
-        leading: Icon(icon, color: Theme.of(context).primaryColor),
-        title: Text(title),
-        trailing: const Icon(Icons.chevron_right),
+        leading: Icon(icon, color: color),
+        title: Text(
+          title,
+          style: const TextStyle(color: Colors.white),
+        ),
+        trailing: const Icon(Icons.chevron_right, color: Colors.white54),
         onTap: onTap,
       ),
     ).animate()
@@ -198,15 +288,20 @@ class ProfileScreen extends StatelessWidget {
   }
 
   void _showEditProfileDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (context) => EditProfileDialog(
-      onSave: (newUserData) {
-        _updateUserData(newUserData);
-      },
-    ),
-  );
-}
+    showDialog(
+      context: context,
+      builder: (context) => Theme(
+        data: Theme.of(context).copyWith(
+          dialogBackgroundColor: const Color(0xFF2C2C2C),
+        ),
+        child: EditProfileDialog(
+          onSave: (newUserData) {
+            _updateUserData(newUserData);
+          },
+        ),
+      ),
+    );
+  }
 
   void _showQuizHistory(BuildContext context) {
     Navigator.push(
@@ -221,9 +316,17 @@ class ProfileScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Reset Progress'),
+        backgroundColor: const Color(0xFF2C2C2C),
+        title: const Text(
+          'Reset Progress',
+          style: TextStyle(color: Colors.white),
+        ),
         content: const Text(
           'Are you sure you want to reset all your quiz progress? This action cannot be undone.',
+          style: TextStyle(color: Colors.white70),
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
         ),
         actions: [
           TextButton(
@@ -232,8 +335,7 @@ class ProfileScreen extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
-              // Reset progress logic here
-              _resetUserProgress(); // Call reset function
+              _resetUserProgress();
               Navigator.pop(context);
             },
             style: TextButton.styleFrom(
@@ -248,12 +350,12 @@ class ProfileScreen extends StatelessWidget {
 
   void _updateUserData(Map<String, dynamic> newUserData) {
     final userBox = Hive.box('userBox');
-    userBox.put('currentUser', newUserData); // Update user data in Hive
+    userBox.put('currentUser', newUserData);
   }
 
   void _resetUserProgress() {
     final userBox = Hive.box('userBox');
-    userBox.put('currentUser', { // Reset user data
+    userBox.put('currentUser', {
       'email': 'guest@example.com',
       'name': 'Guest User',
       'quizzesTaken': 0,

@@ -5,7 +5,6 @@ import 'package:quizapp/services/quiz.dart';
 
 import 'profile.dart';
 
-
 class QuizDashboard extends StatefulWidget {
   const QuizDashboard({super.key});
 
@@ -16,35 +15,48 @@ class QuizDashboard extends StatefulWidget {
 class _QuizDashboardState extends State<QuizDashboard> {
   final QuizService _quizService = QuizService();
   
-  // Quiz categories data
+  // Quiz categories data with added colors
   final List<Map<String, dynamic>> quizCategories = [
-    {'name': 'Science', 'icon': Icons.science},
-    {'name': 'History', 'icon': Icons.history_edu},
-    {'name': 'Mathematics', 'icon': Icons.calculate},
-    {'name': 'Geography', 'icon': Icons.public},
+    {
+      'name': 'Science',
+      'icon': Icons.science,
+      'color': const Color(0xFF64B5F6),  // Blue
+    },
+    {
+      'name': 'History',
+      'icon': Icons.history_edu,
+      'color': const Color(0xFFFFB74D),  // Orange
+    },
+    {
+      'name': 'Mathematics',
+      'icon': Icons.calculate,
+      'color': const Color(0xFF81C784),  // Green
+    },
+    {
+      'name': 'Geography',
+      'icon': Icons.public,
+      'color': const Color(0xFFBA68C8),  // Purple
+    },
   ];
 
-  // Start quiz function
   Future<void> _startQuiz(String category) async {
     try {
-      // Show loading indicator
       showDialog(
         context: context,
         barrierDismissible: false,
         builder: (context) => const Center(
-          child: CircularProgressIndicator(),
+          child: CircularProgressIndicator(
+            color: Colors.white,
+          ),
         ),
       );
 
-      // Fetch questions from API
       final questions = await _quizService.fetchQuestions();
       
       if (!mounted) return;
       
-      // Remove loading indicator
       Navigator.pop(context);
       
-      // Navigate to quiz screen
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -55,41 +67,58 @@ class _QuizDashboardState extends State<QuizDashboard> {
         ),
       );
     } catch (e) {
-      // Handle errors
       if (!mounted) return;
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error loading questions: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: Colors.redAccent,
         ),
       );
     }
   }
 
   Widget _buildCategoryCard(int index) {
+    final category = quizCategories[index];
     return Card(
-      elevation: 4,
+      elevation: 8,
+      color: const Color(0xFF2C2C2C),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: InkWell(
-        onTap: () => _startQuiz(quizCategories[index]['name']),
-        borderRadius: BorderRadius.circular(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              quizCategories[index]['icon'] as IconData,
-              size: 48,
-              color: Theme.of(context).primaryColor,
+        onTap: () => _startQuiz(category['name']),
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                category['color'].withOpacity(0.2),
+                const Color(0xFF2C2C2C),
+              ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              quizCategories[index]['name'] as String,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-          ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                category['icon'] as IconData,
+                size: 48,
+                color: category['color'],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                category['name'] as String,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     ).animate()
@@ -103,12 +132,17 @@ class _QuizDashboardState extends State<QuizDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF1A1A1A),
       appBar: AppBar(
-        title: const Text('Quiz Categories'),
+        backgroundColor: const Color(0xFF2C2C2C),
+        title: const Text(
+          'Quiz Categories',
+          style: TextStyle(color: Colors.white),
+        ),
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.person),
+            icon: const Icon(Icons.person, color: Colors.white),
             onPressed: () {
               Navigator.push(
                 context,
@@ -120,31 +154,46 @@ class _QuizDashboardState extends State<QuizDashboard> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Select a Category',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ).animate()
-              .fadeIn(duration: const Duration(milliseconds: 500))
-              .slideX(),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF2C2C2C),
+              Color(0xFF1A1A1A),
+            ],
           ),
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.all(16),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 1,
-              ),
-              itemCount: quizCategories.length,
-              itemBuilder: (context, index) => _buildCategoryCard(index),
+        ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Text(
+                'Select a Category',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ).animate()
+                .fadeIn(duration: const Duration(milliseconds: 500))
+                .slideX(),
             ),
-          ),
-        ],
+            Expanded(
+              child: GridView.builder(
+                padding: const EdgeInsets.all(16),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  childAspectRatio: 1,
+                ),
+                itemCount: quizCategories.length,
+                itemBuilder: (context, index) => _buildCategoryCard(index),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

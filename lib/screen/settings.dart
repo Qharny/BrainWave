@@ -16,10 +16,17 @@ class SettingsScreen extends StatelessWidget {
     final soundNotifier = Provider.of<SoundNotifier>(context);
 
     return Scaffold(
+      backgroundColor: const Color(0xFF1A1A1A), // Dark background
       appBar: AppBar(
-        title: const Text('Settings'),
+        backgroundColor: const Color(0xFF252525), // Slightly lighter dark
+        elevation: 0,
+        title: const Text(
+          'Settings',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
       ),
       body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         children: [
           _buildSettingsSection(
             context,
@@ -29,30 +36,39 @@ class SettingsScreen extends StatelessWidget {
                 context,
                 'Dark Mode',
                 Icons.dark_mode,
-                trailing: Switch(
+                trailing: Switch.adaptive(
                   value: themeNotifier.isDarkMode,
-                  onChanged: (value) {
-                    themeNotifier.toggleTheme();
-                  },
+                  onChanged: (value) => themeNotifier.toggleTheme(),
+                  activeColor: Colors.blue[400],
+                  activeTrackColor: Colors.blue.withOpacity(0.3),
                 ),
+                bottomBorder: true,
               ),
               _buildSettingsTile(
                 context,
                 'Text Size',
                 Icons.text_fields,
-                trailing: DropdownButton<double>(
-                  value: textSizeNotifier.textSize,
-                  items: [12.0, 16.0, 20.0, 24.0]
-                      .map((size) => DropdownMenuItem(
-                            value: size,
-                            child: Text('${size.toInt()} pt'),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    if (value != null) {
-                      textSizeNotifier.setTextSize(value);
-                    }
-                  },
+                trailing: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF303030),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: DropdownButton<double>(
+                    value: textSizeNotifier.textSize,
+                    dropdownColor: const Color(0xFF303030),
+                    underline: Container(),
+                    style: const TextStyle(color: Colors.white),
+                    items: [12.0, 16.0, 20.0, 24.0]
+                        .map((size) => DropdownMenuItem(
+                              value: size,
+                              child: Text('${size.toInt()} pt'),
+                            ))
+                        .toList(),
+                    onChanged: (value) {
+                      if (value != null) textSizeNotifier.setTextSize(value);
+                    },
+                  ),
                 ),
               ),
             ],
@@ -65,11 +81,11 @@ class SettingsScreen extends StatelessWidget {
                 context,
                 'Sound Effects',
                 Icons.volume_up,
-                trailing: Switch(
+                trailing: Switch.adaptive(
                   value: soundNotifier.isSoundEnabled,
-                  onChanged: (value) {
-                    soundNotifier.toggleSound();
-                  },
+                  onChanged: (value) => soundNotifier.toggleSound(),
+                  activeColor: Colors.blue[400],
+                  activeTrackColor: Colors.blue.withOpacity(0.3),
                 ),
               ),
             ],
@@ -82,17 +98,27 @@ class SettingsScreen extends StatelessWidget {
                 context,
                 'Difficulty',
                 Icons.speed,
-                trailing: DropdownButton<String>(
-                  value: 'Medium',
-                  items: ['Easy', 'Medium', 'Hard']
-                      .map((difficulty) => DropdownMenuItem(
-                            value: difficulty,
-                            child: Text(difficulty),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    // Implement difficulty changing
-                  },
+                trailing: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF303030),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: DropdownButton<String>(
+                    value: 'Medium',
+                    dropdownColor: const Color(0xFF303030),
+                    underline: Container(),
+                    style: const TextStyle(color: Colors.white),
+                    items: ['Easy', 'Medium', 'Hard']
+                        .map((difficulty) => DropdownMenuItem(
+                              value: difficulty,
+                              child: Text(difficulty),
+                            ))
+                        .toList(),
+                    onChanged: (value) {
+                      // Implement difficulty changing
+                    },
+                  ),
                 ),
               ),
             ],
@@ -108,6 +134,7 @@ class SettingsScreen extends StatelessWidget {
                 onTap: () {
                   // Implement password change
                 },
+                bottomBorder: true,
               ),
               _buildSettingsTile(
                 context,
@@ -116,14 +143,14 @@ class SettingsScreen extends StatelessWidget {
                 onTap: () {
                   // Implement privacy settings
                 },
+                bottomBorder: true,
               ),
               _buildSettingsTile(
                 context,
                 'Logout',
                 Icons.logout,
-                textColor: Colors.red,
+                textColor: Colors.redAccent,
                 onTap: () {
-                  // Implement logout
                   Hive.box('user').clear();
                   Navigator.push(
                     context,
@@ -152,11 +179,21 @@ class SettingsScreen extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Text(
             title,
-            style: Theme.of(context).textTheme.titleLarge,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.white70,
+            ),
           ),
         ),
-        ...tiles,
-        const Divider(),
+        Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFF252525),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(children: tiles),
+        ),
+        const SizedBox(height: 24),
       ],
     );
   }
@@ -168,104 +205,35 @@ class SettingsScreen extends StatelessWidget {
     Widget? trailing,
     VoidCallback? onTap,
     Color? textColor,
+    bool bottomBorder = false,
   }) {
-    return ListTile(
-      leading: Icon(icon, color: Theme.of(context).primaryColor),
-      title: Text(
-        title,
-        style: TextStyle(color: textColor),
+    return Container(
+      decoration: BoxDecoration(
+        border: bottomBorder
+            ? const Border(
+                bottom: BorderSide(
+                  color: Color(0xFF303030),
+                  width: 1,
+                ),
+              )
+            : null,
       ),
-      trailing: trailing ?? const Icon(Icons.chevron_right),
-      onTap: onTap,
-    );
-  }
-}
-
-// Additional screens (add these to separate files):
-
-class EditProfileDialog extends StatefulWidget {
-  const EditProfileDialog(
-      {super.key, required Null Function(dynamic newUserData) onSave});
-
-  @override
-  State<EditProfileDialog> createState() => _EditProfileDialogState();
-}
-
-class _EditProfileDialogState extends State<EditProfileDialog> {
-  final _nameController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    final userBox = Hive.box('userBox');
-    final user = userBox.get('currentUser', defaultValue: {'name': ''});
-    _nameController.text = user['name'];
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Edit Profile'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: _nameController,
-            decoration: const InputDecoration(
-              labelText: 'Name',
-              border: OutlineInputBorder(),
-            ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        leading: Icon(
+          icon,
+          color: Colors.blue[400],
+        ),
+        title: Text(
+          title,
+          style: TextStyle(
+            color: textColor ?? Colors.white,
+            fontSize: 16,
           ),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
         ),
-        TextButton(
-          onPressed: () {
-            // Save profile changes
-            Navigator.pop(context);
-          },
-          child: const Text('Save'),
-        ),
-      ],
-    );
-  }
-}
-
-class QuizHistoryScreen extends StatelessWidget {
-  const QuizHistoryScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Quiz History'),
-      ),
-      body: ListView.builder(
-        itemCount: 10,
-        itemBuilder: (context, index) {
-          return Card(
-            margin: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 8,
-            ),
-            child: ListTile(
-              leading: CircleAvatar(
-                child: Text('${90 - index}%'),
-              ),
-              title: Text('Science Quiz ${index + 1}'),
-              subtitle: Text(
-                  'Completed on ${DateTime.now().toString().split(' ')[0]}'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                // Show detailed quiz results
-              },
-            ),
-          );
-        },
+        trailing:
+            trailing ?? const Icon(Icons.chevron_right, color: Colors.white54),
+        onTap: onTap,
       ),
     );
   }
