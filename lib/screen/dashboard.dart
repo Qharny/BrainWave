@@ -3,6 +3,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:quizapp/screen/home.dart';
 import 'package:quizapp/services/quiz.dart';
 
+import 'profile.dart';
+
 
 class QuizDashboard extends StatefulWidget {
   const QuizDashboard({super.key});
@@ -65,7 +67,6 @@ class _QuizDashboardState extends State<QuizDashboard> {
     }
   }
 
-  // Build category card
   Widget _buildCategoryCard(int index) {
     return Card(
       elevation: 4,
@@ -109,7 +110,12 @@ class _QuizDashboardState extends State<QuizDashboard> {
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () {
-              // Add profile or settings navigation here
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProfileScreen(),
+                ),
+              );
             },
           ),
         ],
