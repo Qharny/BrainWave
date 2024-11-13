@@ -7,6 +7,7 @@ import 'package:quizapp/splash.dart';
 import 'package:quizapp/auth/auth.dart';
 import 'package:quizapp/theme/theme_notifier.dart';
 import 'package:quizapp/theme/text_size_notifier.dart';
+import 'package:quizapp/theme/sound_notifier.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +19,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeNotifier()),
         ChangeNotifierProvider(create: (_) => TextSizeNotifier()),
+        ChangeNotifierProvider(create: (_) => SoundNotifier()),
       ],
       child: const BrainWaveApp(),
     ),
@@ -31,6 +33,7 @@ class BrainWaveApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     final textSizeNotifier = Provider.of<TextSizeNotifier>(context);
+    final soundNotifier = Provider.of<SoundNotifier>(context);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,

@@ -4,6 +4,7 @@ import 'package:quizapp/auth/auth.dart';
 import 'package:provider/provider.dart';
 import 'package:quizapp/theme/theme_notifier.dart';
 import 'package:quizapp/theme/text_size_notifier.dart';
+import 'package:quizapp/theme/sound_notifier.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -12,6 +13,7 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     final textSizeNotifier = Provider.of<TextSizeNotifier>(context);
+    final soundNotifier = Provider.of<SoundNotifier>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -57,19 +59,25 @@ class SettingsScreen extends StatelessWidget {
           ),
           _buildSettingsSection(
             context,
-            'Quiz Preferences',
+            'Sound Settings',
             [
               _buildSettingsTile(
                 context,
                 'Sound Effects',
                 Icons.volume_up,
                 trailing: Switch(
-                  value: true,
+                  value: soundNotifier.isSoundEnabled,
                   onChanged: (value) {
-                    // Implement sound toggle
+                    soundNotifier.toggleSound();
                   },
                 ),
               ),
+            ],
+          ),
+          _buildSettingsSection(
+            context,
+            'Quiz Preferences',
+            [
               _buildSettingsTile(
                 context,
                 'Difficulty',
@@ -237,7 +245,7 @@ class QuizHistoryScreen extends StatelessWidget {
         title: const Text('Quiz History'),
       ),
       body: ListView.builder(
-        itemCount: 10, // Replace with actual history count
+        itemCount: 10,
         itemBuilder: (context, index) {
           return Card(
             margin: const EdgeInsets.symmetric(

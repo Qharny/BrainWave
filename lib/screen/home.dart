@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../models/question.dart';
 import 'package:hive/hive.dart';
+import 'package:provider/provider.dart';
+import '../theme/sound_notifier.dart';
 
 class QuizScreen extends StatefulWidget {
   final List<QuizQuestion> questions;
@@ -31,6 +33,13 @@ class _QuizScreenState extends State<QuizScreen> {
       hasAnswered = true;
       if (answer == widget.questions[currentQuestionIndex].correctAnswer) {
         score++;
+        if (Provider.of<SoundNotifier>(context, listen: false).isSoundEnabled) {
+          // Play sound for correct answer
+        }
+      } else {
+        if (Provider.of<SoundNotifier>(context, listen: false).isSoundEnabled) {
+          // Play sound for incorrect answer
+        }
       }
     });
 
