@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:quizapp/auth/auth.dart';
+import 'package:provider/provider.dart';
+import 'package:quizapp/theme/theme_notifier.dart';
+import 'package:quizapp/theme/text_size_notifier.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final textSizeNotifier = Provider.of<TextSizeNotifier>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
@@ -22,9 +28,9 @@ class SettingsScreen extends StatelessWidget {
                 'Dark Mode',
                 Icons.dark_mode,
                 trailing: Switch(
-                  value: Theme.of(context).brightness == Brightness.dark,
+                  value: themeNotifier.isDarkMode,
                   onChanged: (value) {
-                    // Implement theme switching
+                    themeNotifier.toggleTheme();
                   },
                 ),
               ),
@@ -32,16 +38,18 @@ class SettingsScreen extends StatelessWidget {
                 context,
                 'Text Size',
                 Icons.text_fields,
-                trailing: DropdownButton<String>(
-                  value: 'Normal',
-                  items: ['Small', 'Normal', 'Large']
+                trailing: DropdownButton<double>(
+                  value: textSizeNotifier.textSize,
+                  items: [12.0, 16.0, 20.0, 24.0]
                       .map((size) => DropdownMenuItem(
                             value: size,
-                            child: Text(size),
+                            child: Text('${size.toInt()} pt'),
                           ))
                       .toList(),
                   onChanged: (value) {
-                    // Implement text size changing
+                    if (value != null) {
+                      textSizeNotifier.setTextSize(value);
+                    }
                   },
                 ),
               ),

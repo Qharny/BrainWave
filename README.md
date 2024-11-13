@@ -42,7 +42,7 @@ lib/
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/brainwave-quiz-app.git
+   git clone https://github.com/qharny/brainwave.git
    cd brainwave-quiz-app
    ```
 

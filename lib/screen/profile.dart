@@ -202,7 +202,7 @@ class ProfileScreen extends StatelessWidget {
     context: context,
     builder: (context) => EditProfileDialog(
       onSave: (newUserData) {
-        _updateUserData(newUserData); // Update user data in Hive
+        _updateUserData(newUserData);
       },
     ),
   );

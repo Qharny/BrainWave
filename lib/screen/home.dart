@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../models/question.dart';
+import 'package:hive/hive.dart';
 
 class QuizScreen extends StatefulWidget {
   final List<QuizQuestion> questions;
@@ -47,6 +48,29 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   void _showResults() {
+    final userBox = Hive.box('userBox');
+    final currentUser = userBox.get('currentUser');
+    int quizzesTaken = currentUser['quizzesTaken'] + 1;
+    double newAverageScore = ((currentUser['averageScore'] * (quizzesTaken - 1)) + score) / quizzesTaken;
+
+    userBox.put('currentUser', {
+      ...currentUser,
+      'quizzesTaken': quizzesTaken,
+      'averageScore': newAverageScore,
+    });
+
+    // Save quiz result to history
+    final historyBox = Hive.box('historyBox');
+    final quizResult = {
+      'category': widget.category,
+      'score': score,
+      'totalQuestions': widget.questions.length,
+      'date': DateTime.now().toString(),
+    };
+    List<Map<String, dynamic>> quizHistory = historyBox.get('quizHistory', defaultValue: []);
+    quizHistory.add(quizResult);
+    historyBox.put('quizHistory', quizHistory);
+
     showDialog(
       context: context,
       barrierDismissible: false,

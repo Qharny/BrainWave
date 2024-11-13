@@ -14,23 +14,64 @@ class _AuthScreenState extends State<AuthScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _nameController = TextEditingController(); // Added for registration
   bool _isLogin = true;
 
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       final userBox = Hive.box('userBox');
+      
       if (_isLogin) {
-        // Simple login logic - in real app, add proper authentication
-        if (userBox.get(_emailController.text) == _passwordController.text) {
+        // Login logic
+        final userData = userBox.get('users_${_emailController.text}');
+        if (userData != null && userData['password'] == _passwordController.text) {
+          // Set current user data
+          userBox.put('currentUser', {
+            'email': _emailController.text,
+            'name': userData['name'],
+            'quizzesTaken': userData['quizzesTaken'] ?? 0,
+            'averageScore': userData['averageScore'] ?? 0.0,
+          });
+          
+          userBox.put('isLoggedIn', true);
+          
+          if (mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const QuizDashboard()),
+            );
+          }
+        } else {
+          // Show error message
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Invalid credentials')),
+          );
+        }
+      } else {
+        // Registration logic
+        await userBox.put('users_${_emailController.text}', {
+          'password': _passwordController.text,
+          'name': _nameController.text,
+          'quizzesTaken': 0,
+          'averageScore': 0.0,
+        });
+
+        // Set current user data
+        userBox.put('currentUser', {
+          'email': _emailController.text,
+          'name': _nameController.text,
+          'quizzesTaken': 0,
+          'averageScore': 0.0,
+        });
+        
+        userBox.put('isLoggedIn', true);
+        
+        if (mounted) {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const QuizDashboard()),
           );
         }
-      } else {
-        // Simple registration - in real app, add proper user management
-        await userBox.put(_emailController.text, _passwordController.text);
-        setState(() => _isLogin = true);
       }
     }
   }
@@ -39,7 +80,7 @@ class _AuthScreenState extends State<AuthScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(20.0),
           child: Form(
             key: _formKey,
@@ -53,6 +94,19 @@ class _AuthScreenState extends State<AuthScreen> {
                   textAlign: TextAlign.center,
                 ).animate().fadeIn().slideX(),
                 const SizedBox(height: 30),
+                if (!_isLogin)
+                  TextFormField(
+                    controller: _nameController,
+                    decoration: InputDecoration(
+                      labelText: 'Name',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    validator: (value) =>
+                        value?.isEmpty ?? true ? 'Please enter your name' : null,
+                  ).animate().fadeIn().slideX(),
+                if (!_isLogin) const SizedBox(height: 16),
                 TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
@@ -102,5 +156,13 @@ class _AuthScreenState extends State<AuthScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _nameController.dispose();
+    super.dispose();
   }
 }
